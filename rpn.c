@@ -431,7 +431,7 @@ void go_help()
 	printf( "BY TIM LINDNER, DECEMBER 2020\n\n");
 	printf( "USAGE: TYPE IN VALUE AND <ENTER>THEM ON TO THE STACK\n");
 	printf( "THEN PRESS A KEY TO OPERATE ON  THE TOP OF THE STACK:\n");
-	printf( "A - ADDITION S - SUBTRACION\n");
+	printf( "A - ADDITION S - SUBTRACTION\n");
 	printf( "M - MULTIPLY D - DIVISION\n");
 	printf( "Q - SQUARE ROOT\n");
 	printf( "W - SWAP O - DROP\n");
