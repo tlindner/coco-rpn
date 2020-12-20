@@ -1,4 +1,4 @@
-Color Computer RPN Calculator, featuring the MC6843.
+Color Computer RPN Calculator, featuring the MC6839.
 
 This is in the public Domain.
 
