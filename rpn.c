@@ -10,19 +10,27 @@
 #include <coco.h>
 #include "fp09.h"
 
+#if 1  /* Change to 0 to use single precision. */
+typedef fp09_double Float;
+#define FLOAT_TYPE_ID fp09_double_type
+#else
+typedef fp09_single Float;
+#define FLOAT_TYPE_ID fp09_single_type
+#endif
+
 byte is_numeric( byte x );
-void print_double( fp09_double *d );
+void print_float( Float *d );
 void stack_input_buffer();
 void draw_stack();
 void move_stack_up();
 void check_error( fp09_FPCB *cb );
 void go_help();
 
-fp09_double stack[8];
+Float stack[8];
 byte input_buffer[31];
 byte blank;
 byte decimal_point;
-fp09_FPCB fpcb = {fp09_double_type, 0, 0, 0, trap_6839};
+fp09_FPCB fpcb = {FLOAT_TYPE_ID, 0, 0, 0, trap_6839};
 
 int main()
 {
@@ -38,6 +46,9 @@ int main()
 	}
 
 	decimal_point = FALSE;
+
+	locate(0, 15);
+	printf("SIZE OF FLOAT TYPE: %u BYTES", sizeof(Float));
 
 	draw_stack();
 
@@ -161,18 +172,18 @@ int main()
 			// shift stack up
 			for( c=0; c<7; c++ )
 			{
-				memcpy(stack[c], stack[c+1], 8);
+				memcpy(stack[c], stack[c+1], sizeof(Float));
 			}
 
-			memset( stack[7], 0, 8 );
+			memset( stack[7], 0, sizeof(Float) );
 		}
 		else if( x=='W' )
 		{
-			fp09_double temp;
+			Float temp;
 
-			memcpy( temp, stack[0], sizeof(fp09_double));
-			memcpy( stack[0], stack[1], sizeof(fp09_double));
-			memcpy( stack[1], temp, sizeof(fp09_double));
+			memcpy( temp, stack[0], sizeof(Float));
+			memcpy( stack[0], stack[1], sizeof(Float));
+			memcpy( stack[1], temp, sizeof(Float));
 		}
 		else if( x=='Q' )
 		{
@@ -238,13 +249,13 @@ void trap_6839()
 	printf( "trap: %d\n", trap_type );
 }
 
-void print_double( fp09_double *d )
+void print_float( Float *d )
 {
 	byte c;
 
 	fp09_bcd result;
 	memset( &result, 0, sizeof(fp09_bcd) );
-	fp09_FPCB cb = {fp09_double_type, 0, 0, 0, trap_6839};
+	fp09_FPCB cb = {FLOAT_TYPE_ID, 0, 0, 0, trap_6839};
 	fp09_BINDEC( &cb, 19, d, &result );
 
 
@@ -323,7 +334,7 @@ void print_double( fp09_double *d )
 
 void stack_input_buffer()
 {
-	fp09_double result;
+	Float result;
 	sbyte i;
 	byte c;
 // 	fp09_bcd bcd = {0,{0,0,0,0},0x00,{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},0};
@@ -358,10 +369,10 @@ void stack_input_buffer()
 		// shift stack down
 		for( i=7; i>-1; i-- )
 		{
-			memcpy(stack[i+1], stack[i], 8);
+			memcpy(stack[i+1], stack[i], sizeof(Float));
 		}
 
-		memcpy(stack[0], result, 8);
+		memcpy(stack[0], result, sizeof(Float));
 
 		// blank input buffer
 		blank = TRUE;
@@ -389,7 +400,7 @@ void draw_stack()
 	for(c=0; c<8; c++ )
 	{
 		locate( 0, c+3 );
-		print_double( stack[c] );
+		print_float( stack[c] );
 	}
 }
 
@@ -401,10 +412,10 @@ void move_stack_up()
 	// shift stack up
 	for( c=1; c<7; c++ )
 	{
-		memcpy(stack[c], stack[c+1], 8);
+		memcpy(stack[c], stack[c+1], sizeof(Float));
 	}
 
-	memset( stack[7], 0, 8 );
+	memset( stack[7], 0, sizeof(Float) );
 }
 
 void check_error( fp09_FPCB *cb )
