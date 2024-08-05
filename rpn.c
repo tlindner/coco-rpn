@@ -10,7 +10,8 @@
 #include <coco.h>
 #include "fp09.h"
 
-#if 1  /* Change to 0 to use single precision. */
+/* Define SINGLE to use single precision */
+#ifdef DOUBLE
 typedef fp09_double Float;
 #define FLOAT_TYPE_ID fp09_double_type
 #else
@@ -67,6 +68,7 @@ int main()
 		}
 
 		// wait for input
+		check_error( &fpcb );
 		locate(31,0);
 		x = waitkey(TRUE);
 
@@ -133,7 +135,6 @@ int main()
 			if( blank == FALSE ) stack_input_buffer();
 			fp09_FADD( &fpcb, stack[1], stack[0], stack[0] );
 			move_stack_up();
-			check_error( &fpcb );
 		}
 		else if (x == 'S' ) // Subtraction
 		{
@@ -144,7 +145,6 @@ int main()
 			fp09_FSUB( &fpcb, stack[1], stack[0], stack[0] );
 
 			move_stack_up();
-			check_error( &fpcb );
 		}
 		else if (x == 'M' ) // Multiply
 		{
@@ -155,7 +155,6 @@ int main()
 			fp09_FMUL( &fpcb, stack[1], stack[0], stack[0] );
 
 			move_stack_up();
-			check_error( &fpcb );
 		}
 		else if (x == 'D' ) // Divide
 		{
@@ -165,7 +164,6 @@ int main()
 			if( blank == FALSE ) stack_input_buffer();
 			fp09_FDIV( &fpcb, stack[1], stack[0], stack[0] );
 			move_stack_up();
-			check_error( &fpcb );
 		}
 		else if (x == 'O' )
 		{
@@ -192,7 +190,6 @@ int main()
 
 			if( blank == FALSE ) stack_input_buffer();
 			fp09_FSQRT( &fpcb, stack[0], stack[0] );
-			check_error( &fpcb );
 		}
 		else if (x == 8 ) // delete key;
 		{
@@ -387,10 +384,6 @@ void stack_input_buffer()
 		printf( "                              ");
 
 	}
-	else
-	{
-		check_error( &fpcb );
-	}
 }
 
 void draw_stack()
@@ -420,15 +413,24 @@ void move_stack_up()
 
 void check_error( fp09_FPCB *cb )
 {
-	locate(1,0);
-	printf( "ERROR: ");
-	if( cb->status & fp09_status_undefined) printf( "UNDEFINED ");
-	if( cb->status & fp09_status_integer_overflow) printf( "INT OVERFLOW ");
-	if( cb->status & fp09_status_unordered) printf( "UNORDERED ");
-	if( cb->status & fp09_status_division_zero) printf( "DIV BY 0 ");
-	if( cb->status & fp09_status_underflow) printf( "UNDERFLOW ");
-	if( cb->status & fp09_status_overflow) printf( "OVERFLOW ");
-	if( cb->status & fp09_status_invalid_operation) printf( "INVALID ");
+	locate(0,1);
+ 	printf( "ERROR: ");
+    if( cb->status == 0 )
+    {
+        printf( "NONE\n" );
+    }
+    else
+    {
+        if( cb->status & fp09_status_inexact_result) printf( "INEXACT RESULT ");
+        if( cb->status & fp09_status_undefined) printf( "UNDEFINED ");
+        if( cb->status & fp09_status_integer_overflow) printf( "INT OVERFLOW ");
+        if( cb->status & fp09_status_unordered) printf( "UNORDERED ");
+        if( cb->status & fp09_status_division_zero) printf( "DIV BY 0 ");
+        if( cb->status & fp09_status_underflow) printf( "UNDERFLOW ");
+        if( cb->status & fp09_status_overflow) printf( "OVERFLOW ");
+        if( cb->status & fp09_status_invalid_operation) printf( "INVALID ");
+        printf("\n");
+    }
 
 	cb->status = 0;
 	cb->secondary_status = 0;
